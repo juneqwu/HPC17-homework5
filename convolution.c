@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
 
   if(argc != 4)
   {
-    fprintf(stderr, "Usage: %s image.ppm num_loops\n", argv[0]);
+    fprintf(stderr, "Usage: %s image.ppm num_loops num_blurs\n", argv[0]);
     abort();
   }
 
@@ -113,7 +113,7 @@ int main(int argc, char *argv[])
   // load image
   // --------------------------------------------------------------------------
   if (0 != count){
-    filename = "output_cl.ppm";
+    filename = "output_cpu.ppm";
   }
   else{
     count = count + 1;
@@ -135,8 +135,28 @@ int main(int argc, char *argv[])
   // --------------------------------------------------------------------------
   // convert image to grayscale
   // --------------------------------------------------------------------------
-  for(int n = 0; n < xsize*ysize; ++n)
+  for(int n = 0; n < xsize*ysize; ++n){
     gray[n] = (0.21f*r[n])/rgb_max + (0.72f*g[n])/rgb_max + (0.07f*b[n])/rgb_max;
+    congray[n] = gray[n];
+  }
+
+  // --------------------------------------------------------------------------
+  // pad the boundaries with the first row and last rows/columns
+  // --------------------------------------------------------------------------
+  for(int i = 0; i < HALF_FILTER_WIDTH; ++i){
+    for (int j = 0; j < xsize; ++j){
+      congray[i*xsize + j] = gray[HALF_FILTER_WIDTH*xsize + j];
+      congray[(ysize-i-1)*xsize + j] = gray[(ysize-HALF_FILTER_WIDTH-1)*xsize + j];
+    }
+  }
+
+  for(int i = 0; i < ysize; ++i){
+    for(int j = 0; j < HALF_FILTER_WIDTH; ++j){
+      congray[i*xsize +j] = gray[HALF_FILTER_WIDTH + xsize*i];
+      congray[i*xsize + (xsize-j-1)] = gray[(xsize-HALF_FILTER_WIDTH-1) + i*xsize];
+    }
+  }
+
 
   // --------------------------------------------------------------------------
   // execute filter on cpu
@@ -157,13 +177,25 @@ int main(int argc, char *argv[])
       congray[i*xsize + j] = sum;
     }
   }
-
+  
   // --------------------------------------------------------------------------
   // output cpu filtered image
   // --------------------------------------------------------------------------
   printf("Writing cpu filtered image\n");
-  for(int n = 0; n < xsize*ysize; ++n)
+  for(int i = HALF_FILTER_WIDTH; i < ysize - HALF_FILTER_WIDTH; ++i){
+    for(int j = HALF_FILTER_WIDTH; j < xsize - HALF_FILTER_WIDTH; ++j){
+        r[(i-HALF_FILTER_WIDTH)*(xsize - 2*HALF_FILTER_WIDTH)+(j-HALF_FILTER_WIDTH)] =
+  	g[(i-HALF_FILTER_WIDTH)*(xsize - 2*HALF_FILTER_WIDTH)+(j-HALF_FILTER_WIDTH)] =
+  	b[(i-HALF_FILTER_WIDTH)*(xsize - 2*HALF_FILTER_WIDTH)+(j-HALF_FILTER_WIDTH)] =
+  	(int)(congray[i*xsize+j] * rgb_max);
+    }
+   }
+  error = ppma_write("output_cpu1.ppm", xsize-2*HALF_FILTER_WIDTH, ysize-2*HALF_FILTER_WIDTH, r, g, b);
+  if(error) { fprintf(stderr, "error writing image"); abort();}
+
+  for(int n = 0; n < xsize*ysize; ++n){
     r[n] = g[n] = b[n] = (int)(congray[n] * rgb_max);
+  }
   error = ppma_write("output_cpu.ppm", xsize, ysize, r, g, b);
   if(error) { fprintf(stderr, "error writing image"); abort(); }
 
@@ -172,7 +204,7 @@ int main(int argc, char *argv[])
   // --------------------------------------------------------------------------
   cl_context ctx;
   cl_command_queue queue;
-  create_context_on(CHOOSE_INTERACTIVELY, CHOOSE_INTERACTIVELY, 0, &ctx, &queue, 0);
+  create_context_on(NULL, NULL, 0, &ctx, &queue, 0);
   print_device_info_from_queue(queue);
 
   // --------------------------------------------------------------------------

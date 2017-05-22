@@ -1,0 +1,86 @@
+#########################################
+
+Cuda3:
+
+[1] NVIDIA Corporation
+[0] Tesla T10 Processor
+
+##########################################
+
+****** Local Work Group Size: 2 by 2 *************
+Processed pixels/s: 31.284369 MPixels/s
+Bandwidth: 0.250275 GBit/s
+Flop/s: 1.514360 GFlop/s
+
+
+****** Local Work Group Size: 4 by 4 *************
+Processed pixels/s: 146.965301 MPixels/s
+Bandwidth: 1.175722 GBit/s
+Flop/s: 7.114044 GFlop/s
+
+
+****** Local Work Group Size: 8 by 8 *************
+Processed pixels/s: 272.466696 MPixels/s
+Bandwidth: 2.179734 GBit/s
+Flop/s: 13.189101 GFlop/s
+
+
+****** Local Work Group Size: 16 by 16 *************
+Processed pixels/s: 312.170635 MPixels/s
+Bandwidth: 2.497365 GBit/s
+Flop/s: 15.111021 GFlop/s
+
+
+****** Local Work Group Size: 32 by 16 *************
+Processed pixels/s: 305.141830 MPixels/s
+Bandwidth: 2.441135 GBit/s
+Flop/s: 14.770783 GFlop/s
+
+
+Yes, there is an increase in performace as the local work group size increases until 16 by 16.
+
+####################################################
+
+STAMPEDE: 
+
+TYPE: GPU
+NAME: Tesla K20m
+
+####################################################
+
+****** Local Work Group Size: 2 by 2 *************
+Processed pixels/s: 55.908248 MPixels/s
+Bandwidth: 0.447266 GBit/s
+Flop/s: 2.706311 GFlop/s
+
+
+****** Local Work Group Size: 4 by 4 *************
+Processed pixels/s: 252.229335 MPixels/s
+Bandwidth: 2.017835 GBit/s
+Flop/s: 12.209485 GFlop/s
+
+
+****** Local Work Group Size: 8 by 8 *************
+Processed pixels/s: 1122.766690 MPixels/s
+Bandwidth: 8.982134 GBit/s
+Flop/s: 54.348966 GFlop/s
+
+
+****** Local Work Group Size: 16 by 16 *************
+Processed pixels/s: 1810.902619 MPixels/s
+Bandwidth: 14.487221 GBit/s
+Flop/s: 87.659070 GFlop/s
+
+
+****** Local Work Group Size: 32 by 16 *************
+Processed pixels/s: 1961.391876 MPixels/s
+Bandwidth: 15.691135 GBit/s
+Flop/s: 94.943696 GFlop/s
+
+****** Local Work Group Size: 32 by 32 *************
+Processed pixels/s: 1805.505721 MPixels/s
+Bandwidth: 14.444046 GBit/s
+Flop/s: 87.397827 GFlop/s
+
+The performance increases as the local work group size increases until 32 by 16.
+
